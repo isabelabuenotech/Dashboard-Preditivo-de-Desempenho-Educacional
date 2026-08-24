@@ -1,1 +1,5 @@
-
+N_ALUNO,ESCOLA,RECOMENDACAO_ES,ENEM_2025,PU_2025,PU_2026,SIMULADO_FUVEST,CURSOS,MATURIDADE,PLANO_PRINCIPAL,CHANCE_PLANO_PRINCIPAL,PLANOS_ALTERNATIVOS,CHANCE_PLANO_ALT,SAUDE_MENTAL,DESCRITIVO_RISCO,STATUS_AGOSTO,PRIORIDADE_AGOSTO
+1,Escola Modelo A,Recomendado,680.7,709.2,674.75,49,Medicina,Consolidada,Medicina USP,Baixa,Cursinho,Média,Sem apontamento,Vulnerabilidade socioeconômica,Agendar c/ aluno,Baixa
+2,Escola Modelo A,Recomendado,733.7,714.0,689.5,58,Engenharia Química,Consolidada,Engenharia Computação - USP,Média,Engenharia Física - USP,Alta,Ansiedade,Contexto familiar,Agendar c/ aluno,Média
+3,Escola Modelo B,Recomendado,705.2,704.4,694.8,58,Medicina,Em maturação,Medicina USP,Baixa,Cursinho,Alta,Ansiedade,Sem apontamento,Agendado c/ aluno,Média
+4,Escola Modelo B,Recomendado,720.0,710.0,700.0,60,Direito,Consolidada,Direito USP,Alta,Direito UNESP,Alta,Sem apontamento,Sem apontamento,Feito c/ aluno,Baixa
