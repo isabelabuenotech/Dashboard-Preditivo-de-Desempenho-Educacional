@@ -65,9 +65,9 @@ git commit -m "feat: adiciona gráfico de evolução temporal de simulados"
 ```
 git push origin feature/minha-nova-funcionalidade
 ```
----
-
 8. **Abra um Pull Request.**
+
+---
 
 # 👩‍💻 Autora e Contato
 > **Isabela Bueno**
