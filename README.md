@@ -1,6 +1,4 @@
-# Dashboard-Preditivo-de-Desempenho-Educacional
-
-# 📚 Vestibulares 2026 | Informações e Dicas
+# 📊 Dashboard - Painel preditivo de desempenho escolar/acadêmico
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
