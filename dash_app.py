@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
 from datetime import datetime, timedelta
 
 # ==========================================
@@ -15,7 +14,18 @@ st.set_page_config(
 )
 
 # ==========================================
-# 2. BASE DE CONHECIMENTO FIXA (VESTIBULARES)
+# 2. CREDENCIAIS DE ACESSO FICTÍCIAS
+# ==========================================
+# Dicionário de credenciais de teste para simulação de login individual
+CREDENCIAIS_ALUNOS = {
+    "Lucas Mendes": "lucas123",
+    "Beatriz Souza": "bia2026",
+    "Gabriel Lima": "gabriel4321",
+    "Mariana Costa": "mari8765"
+}
+
+# ==========================================
+# 3. BASE DE CONHECIMENTO FIXA (VESTIBULARES)
 # ==========================================
 @st.cache_data
 def load_vestibulares_info():
@@ -56,7 +66,7 @@ def load_vestibulares_info():
     ])
 
 # ==========================================
-# 3. GERAÇÃO DE DADOS FICTÍCIOS (MOCK DATA)
+# 4. GERAÇÃO DE DADOS FICTÍCIOS (MOCK DATA)
 # ==========================================
 @st.cache_data
 def load_student_mock_data():
@@ -75,17 +85,11 @@ def load_student_mock_data():
     ]
     faculdades = ["USP", "UNICAMP", "UNESP", "FEDERAL/ENEM", "PUC"]
     
-    alunos_info = [
-        ("Lucas Mendes", "1234"),
-        ("Beatriz Souza", "5678"),
-        ("Gabriel Lima", "4321"),
-        ("Mariana Costa", "8765")
-    ]
-    
+    alunos_lista = list(CREDENCIAIS_ALUNOS.items())
     records = []
     base_date = datetime.now() - timedelta(days=120)
     
-    for i, (nome, senha) in enumerate(alunos_info):
+    for i, (nome, senha) in enumerate(alunos_lista):
         escola = escolas[i % len(escolas)]
         serie = series[i % len(series)]
         interesse = interesses[i % len(interesses)]
@@ -121,7 +125,7 @@ def load_student_mock_data():
 df_raw = load_student_mock_data()
 df_vestibulares = load_vestibulares_info()
 
-# Initialize session state for user-editable inscriptions
+# Estado para inscrições editáveis pelo aluno
 if "inscricoes" not in st.session_state:
     st.session_state.inscricoes = pd.DataFrame({
         "Processo Seletivo": ["ENEM 2026", "FUVEST 2027"],
@@ -131,18 +135,17 @@ if "inscricoes" not in st.session_state:
     })
 
 # ==========================================
-# 4. AUTENTICAÇÃO E FILTROS DA BARRA LATERAL
+# 5. AUTENTICAÇÃO E FILTROS DA BARRA LATERAL
 # ==========================================
 st.sidebar.title("🔐 Acesso do Aluno")
 
-# Filtros globais obrigatórios para segmentação da base
+# Filtros globais para segmentação
 escolas_disponiveis = sorted(df_raw["escola"].unique().tolist())
 escolas_selecionadas = st.sidebar.multiselect("Filtrar por Colégio:", escolas_disponiveis, default=escolas_disponiveis)
 
 series_disponiveis = sorted(df_raw["serie"].unique().tolist())
 series_selecionadas = st.sidebar.multiselect("Filtrar por Série:", series_disponiveis, default=series_disponiveis)
 
-# Aplicar filtros globais antes da lista de seleção individual
 df_filtered_global = df_raw[
     (df_raw["escola"].isin(escolas_selecionadas)) &
     (df_raw["serie"].isin(series_selecionadas))
@@ -152,25 +155,40 @@ if df_filtered_global.empty:
     st.warning("Ajuste os filtros de Colégio e Série na barra lateral para visualizar os alunos.")
     st.stop()
 
-# Seleção de Aluno
+# Seleção do Aluno
 alunos_disponiveis = sorted(df_filtered_global["nome"].unique().tolist())
 aluno_selecionado = st.sidebar.selectbox("Selecione o seu Nome:", alunos_disponiveis)
 
 # Campo de Senha
 senha_input = st.sidebar.text_input("Senha de Acesso:", type="password")
 
-# Validação do Acesso
+# Validação das Credenciais com o Dicionário
 df_aluno = df_filtered_global[df_filtered_global["nome"] == aluno_selecionado]
-senha_correta = df_aluno["senha"].iloc[0] if not df_aluno.empty else None
+senha_correta = CREDENCIAIS_ALUNOS.get(aluno_selecionado)
 
 if not senha_input:
     st.info("👋 Por favor, insira sua senha de acesso na barra lateral para abrir seu painel.")
-    st.stop()
-elif senha_input != senha_correta:
-    st.error("❌ Senha incorreta. Verifique suas credenciais e tente novamente.")
+    
+    # Exibe tabela informativa com as senhas fictícias na tela inicial para testes
+    with st.expander("🔑 Clique aqui para visualizar as senhas de acesso fictícias (Modo de Teste)"):
+        df_credenciais_view = pd.DataFrame(
+            list(CREDENCIAIS_ALUNOS.items()),
+            columns=["Nome do Aluno", "Senha Fictícia de Acesso"]
+        )
+        st.table(df_credenciais_view)
     st.stop()
 
-# Filtro adicional de data
+elif senha_input != senha_correta:
+    st.error("❌ Senha incorreta. Verifique suas credenciais na tabela abaixo e tente novamente.")
+    with st.expander("🔑 Consultar senhas de teste"):
+        df_credenciais_view = pd.DataFrame(
+            list(CREDENCIAIS_ALUNOS.items()),
+            columns=["Nome do Aluno", "Senha Fictícia de Acesso"]
+        )
+        st.table(df_credenciais_view)
+    st.stop()
+
+# Filtro por período de data após login
 min_date = df_aluno["data_registro"].min().date()
 max_date = df_aluno["data_registro"].max().date()
 
@@ -183,25 +201,23 @@ data_inicio, data_fim = st.sidebar.date_input(
     max_value=max_date
 )
 
-# Filtragem Final do Estudante Autenticado
 df_aluno_periodo = df_aluno[
     (df_aluno["data_registro"].dt.date >= data_inicio) &
     (df_aluno["data_registro"].dt.date <= data_fim)
 ].sort_values("data_registro")
 
 if df_aluno_periodo.empty:
-    st.warning("Nenhum registro acadêmico encontrado para o período de data selecionado.")
+    st.warning("Nenhum registro acadêmico encontrado para o período selecionado.")
     st.stop()
 
 # ==========================================
-# 5. PAINEL PRINCIPAL DO ALUNOS (KPIS)
+# 6. PAINEL PRINCIPAL DO ALUNO (KPIS)
 # ==========================================
 aluno_dados_recentes = df_aluno_periodo.iloc[-1]
 
 st.title(f"🚀 Painel de Aprovação — {aluno_dados_recentes['nome']}")
 st.caption(f"🏫 {aluno_dados_recentes['escola']} | 📌 {aluno_dados_recentes['serie']}")
 
-# Cálculos de Indicadores Acadêmicos
 media_atual = aluno_dados_recentes["media_academica"]
 media_anterior = df_aluno_periodo.iloc[-2]["media_academica"] if len(df_aluno_periodo) > 1 else media_atual
 delta_media = round(media_atual - media_anterior, 1)
@@ -223,7 +239,7 @@ col4.metric("Nota Treineiro", f"{aluno_dados_recentes['nota_treineiro']:.0f} pts
 st.markdown("---")
 
 # ==========================================
-# 6. VISUALIZACÕES GRÁFICAS (PLOTLY)
+# 7. VISUALIZAÇÕES NATIVAS
 # ==========================================
 st.subheader("📊 Desempenho e Evolução Acadêmica")
 
@@ -231,68 +247,95 @@ g1, g2 = st.columns(2)
 
 with g1:
     st.markdown("##### 📈 Evolução das Notas nos Simulados e Média")
-    fig_evolucao = px.line(
-        df_aluno_periodo,
-        x="avaliacao",
-        y=["simulado_geral", "simulado_sas", "nota_treineiro"],
-        markers=True,
-        labels={"value": "Pontuação / Nota", "avaliacao": "Avaliação", "variable": "Indicador"},
-        title="Desempenho Histórico nos Exames"
-    )
-    fig_evolucao.update_layout(legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
-    st.plotly_chart(fig_evolucao, use_container_width=True)
+    df_chart = df_aluno_periodo.set_index("avaliacao")[["simulado_geral", "simulado_sas", "nota_treineiro"]]
+    df_chart.columns = ["Simulado Geral", "Simulado SAS", "Nota Treineiro"]
+    st.line_chart(df_chart)
 
 with g2:
-    st.markdown("##### 🎯 Metas e Distribuição de Desempenho")
-    df_melted = df_aluno_periodo.melt(
-        id_vars=["avaliacao"], 
-        value_vars=["simulado_geral", "simulado_sas", "nota_treineiro"],
-        var_name="TipoExame", 
-        value_name="Pontuacao"
-    )
-    fig_barras = px.bar(
-        df_melted,
-        x="Pontuacao",
-        y="TipoExame",
-        color="avaliacao",
-        barmode="group",
-        orientation="h",
-        title="Comparativo entre Modalidades de Simulados"
-    )
-    st.plotly_chart(fig_barras, use_container_width=True)
+    st.markdown("##### 🎯 Comparativo Última Avaliação x Médias")
+    df_bar = pd.DataFrame({
+        "Pontuação": [simulado_atual, sas_atual, aluno_dados_recentes['nota_treineiro']]
+    }, index=["Simulado Geral", "Simulado SAS", "Treineiro"])
+    st.bar_chart(df_bar)
 
 st.markdown("---")
 
 # ==========================================
-# 7. PLANEJAMENTO DE CARREIRA E ESTRATÉGIA
+# 8. PLANEJAMENTO DE CARREIRA E ESTRATÉGIA
 # ==========================================
+
 st.subheader("🎯 Orientação Profissional e Estratégia de Vestibular")
 
-c_carreira, c_vest = st.columns(2)
+c_carreira, c_vest = st.columns([1.2, 0.8])
 
 with c_carreira:
-    st.markdown("### 🎓 Projeto de Vida e Carreira")
-    st.text_input("Área/Curso de Interesse:", value=aluno_dados_recentes["interesse_profissional"])
-    st.text_input("Faculdade/Instituição Alvo:", value=aluno_dados_recentes["faculdade_interesse"])
-    st.text_area("Justificativa e Motivação da Escolha:", value=aluno_dados_recentes["justificativa_carreira"], height=100)
+    st.markdown("### 🎓 Projeto de Vida e Opções de Carreira")
+    st.caption("Cadastre e gerencie até 3 opções de cursos, instituições e suas respectivas motivações:")
+    
+    tab_op1, tab_op2, tab_op3 = st.tabs(["🥇 1ª Opção (Plano A)", "🥈 2ª Opção (Plano B)", "🥉 3ª Opção (Plano C)"])
+    
+    with tab_op1:
+        st.text_input(
+            "Área / Curso de Interesse (1ª Opção):", 
+            value=aluno_dados_recentes["interesse_profissional"],
+            key="curso_op1"
+        )
+        st.text_input(
+            "Faculdade / Instituição Alvo (1ª Opção):", 
+            value=aluno_dados_recentes["faculdade_interesse"],
+            key="faculdade_op1"
+        )
+        st.text_area(
+            "Justificativa e Motivação da Escolha (1ª Opção):", 
+            value=aluno_dados_recentes["justificativa_carreira"], 
+            height=90,
+            key="just_op1"
+        )
+
+    with tab_op2:
+        st.text_input(
+            "Área / Curso de Interesse (2ª Opção):", 
+            value="Engenharia de Produção",
+            key="curso_op2"
+        )
+        st.text_input(
+            "Faculdade / Instituição Alvo (2ª Opção):", 
+            value="UNICAMP",
+            key="faculdade_op2"
+        )
+        st.text_area(
+            "Justificativa e Motivação da Escolha (2ª Opção):", 
+            value="Segunda opção estratégica com foco em gestão de processos e interface com tecnologia.", 
+            height=90,
+            key="just_op2"
+        )
+
+    with tab_op3:
+        st.text_input(
+            "Área / Curso de Interesse (3ª Opção):", 
+            value="Administração de Empresas",
+            key="curso_op3"
+        )
+        st.text_input(
+            "Faculdade / Instituição Alvo (3ª Opção):", 
+            value="FGV / UNESP",
+            key="faculdade_op3"
+        )
+        st.text_area(
+            "Justificativa e Motivação da Escolha (3ª Opção):", 
+            value="Plano C focado em ampla inserção no mercado corporativo e sólida base financeira.", 
+            height=90,
+            key="just_op3"
+        )
 
 with c_vest:
-    st.markdown("### 🥧 Distribuição de Interesses (Visão de Grupo)")
-    # Mapeamento do perfil de escolhas gerais do grupo
+    st.markdown("### 📊 Distribuição de Interesses (Visão da Turma)")
     df_grupo = df_filtered_global.groupby("nome").last().reset_index()
-    
-    fig_pizza_cursos = px.pie(
-        df_grupo,
-        names="interesse_profissional",
-        title="Cursos Mais Procurados na Turma",
-        hole=0.4
-    )
-    st.plotly_chart(fig_pizza_cursos, use_container_width=True)
-
-st.markdown("---")
+    df_cursos = df_grupo["interesse_profissional"].value_counts().to_frame("Alunos")
+    st.bar_chart(df_cursos)
 
 # ==========================================
-# 8. PROCESSOS SELETIVOS E INSCRIÇÕES
+# 9. PROCESSOS SELETIVOS E INSCRIÇÕES
 # ==========================================
 st.subheader("📚 Guia de Vestibulares e Gestão de Inscrições")
 
@@ -305,7 +348,6 @@ with tab_guia:
 with tab_minhas_inscricoes:
     st.markdown("###### Gerencie suas inscrições e acompanhe o status em tempo real:")
     
-    # Editor interativo de tabela para o aluno preencher
     df_inscricoes_editado = st.data_editor(
         st.session_state.inscricoes,
         num_rows="dynamic",
@@ -328,7 +370,7 @@ with tab_minhas_inscricoes:
     st.session_state.inscricoes = df_inscricoes_editado
 
 # ==========================================
-# 9. REGISTRO HISTÓRICO COMPLETO
+# 10. REGISTRO HISTÓRICO COMPLETO
 # ==========================================
 with st.expander("📄 Visualizar Tabela Completa do Histórico Acadêmico Individual"):
     cols_historico = [
