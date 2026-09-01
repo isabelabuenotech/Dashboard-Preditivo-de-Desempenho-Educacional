@@ -125,13 +125,37 @@ def load_student_mock_data():
 df_raw = load_student_mock_data()
 df_vestibulares = load_vestibulares_info()
 
-# Estado para inscrições editáveis pelo aluno
+# Inicialização dos estados para as tabelas editáveis pelo aluno
 if "inscricoes" not in st.session_state:
     st.session_state.inscricoes = pd.DataFrame({
         "Processo Seletivo": ["ENEM 2026", "FUVEST 2027"],
         "Inscrição Realizada": [True, False],
         "Código de Inscrição": ["10029384", "Pendente"],
         "Isenção Solicitada": ["Aprovada", "Não Solicitada"]
+    })
+
+if "medias_escola" not in st.session_state:
+    st.session_state.medias_escola = pd.DataFrame({
+        "Bimestre / Período": ["1º Bimestre", "2º Bimestre", "3º Bimestre", "4º Bimestre"],
+        "Média Geral da Escola": [8.2, 8.5, 7.9, 8.8],
+        "Faltas Acc.": [2, 1, 3, 0],
+        "Observações": ["Aprovado", "Aprovado", "Atenção em Física", "Aprovado"]
+    })
+
+if "registros_simulados" not in st.session_state:
+    st.session_state.registros_simulados = pd.DataFrame({
+        "Nome do Simulado": ["Simulado Enem SAS 01", "Simulado Fuvest 1ª Fase", "Simulado Unicamp Geral"],
+        "Data Realizada": [datetime.now().date() - timedelta(days=60), datetime.now().date() - timedelta(days=30), datetime.now().date() - timedelta(days=10)],
+        "Desempenho Obtido (Pontos)": [720.5, 68.0, 74.0],
+        "Meta Esperada": [750.0, 72.0, 75.0]
+    })
+
+if "registros_treineiros" not in st.session_state:
+    st.session_state.registros_treineiros = pd.DataFrame({
+        "Nome do Treineiro / Exame": ["Fuvest Treineiro 2ª Série", "Unicamp Treineiro"],
+        "Data Realizada": [datetime.now().date() - timedelta(days=300), datetime.now().date() - timedelta(days=280)],
+        "Desempenho Obtido (Pontos)": [610.0, 590.0],
+        "Status de Classificação": ["Classificado p/ 2ª Fase", "Aprovado na 1ª Fase"]
     })
 
 # ==========================================
@@ -168,8 +192,6 @@ senha_correta = CREDENCIAIS_ALUNOS.get(aluno_selecionado)
 
 if not senha_input:
     st.info("👋 Por favor, insira sua senha de acesso na barra lateral para abrir seu painel.")
-    
-    # Exibe tabela informativa com as senhas fictícias na tela inicial para testes
     with st.expander("🔑 Clique aqui para visualizar as senhas de acesso fictícias (Modo de Teste)"):
         df_credenciais_view = pd.DataFrame(
             list(CREDENCIAIS_ALUNOS.items()),
@@ -239,31 +261,121 @@ col4.metric("Nota Treineiro", f"{aluno_dados_recentes['nota_treineiro']:.0f} pts
 st.markdown("---")
 
 # ==========================================
-# 7. VISUALIZAÇÕES NATIVAS
+# 7. VISUALIZAÇÕES E REGISTRO DE NOTAS PREENCHÍVEIS
 # ==========================================
-st.subheader("📊 Desempenho e Evolução Acadêmica")
+st.subheader("📝 Registro de Notas e Desempenho Acadêmico")
+st.caption("Preencha e atualize suas notas da escola, simulados e exames de treineiro abaixo:")
+
+tab_escola, tab_simulados, tab_treineiros = st.tabs([
+    "🏫 Médias Acadêmicas na Escola", 
+    "📝 Registro de Simulados", 
+    "🎯 Registro de Treineiros"
+])
+
+with tab_escola:
+    st.markdown("##### Preenchimento das Médias Escolares por Período:")
+    df_medias_edited = st.data_editor(
+        st.session_state.medias_escola,
+        num_rows="dynamic",
+        column_config={
+            "Bimestre / Período": st.column_config.SelectboxColumn(
+                "Bimestre/Período",
+                options=["1º Bimestre", "2º Bimestre", "3º Bimestre", "4º Bimestre", "Recuperação", "Média Final"],
+                required=True
+            ),
+            "Média Geral da Escola": st.column_config.NumberColumn(
+                "Média Geral",
+                min_value=0.0,
+                max_value=10.0,
+                format="%.1f",
+                required=True
+            ),
+            "Faltas Acc.": st.column_config.NumberColumn("Faltas Acumuladas", format="%d"),
+            "Observações": st.column_config.TextColumn("Observações do Trimestre/Bimestre")
+        },
+        use_container_width=True,
+        hide_index=True,
+        key="editor_medias"
+    )
+    st.session_state.medias_escola = df_medias_edited
+
+with tab_simulados:
+    st.markdown("##### Preenchimento dos Simulados Realizados:")
+    df_simulados_edited = st.data_editor(
+        st.session_state.registros_simulados,
+        num_rows="dynamic",
+        column_config={
+            "Nome do Simulado": st.column_config.TextColumn("Nome / Identificação do Simulado", required=True),
+            "Data Realizada": st.column_config.DateColumn("Data de Realização", required=True),
+            "Desempenho Obtido (Pontos)": st.column_config.NumberColumn(
+                "Desempenho (Pontos/Acertos)",
+                min_value=0.0,
+                max_value=1000.0,
+                format="%.1f",
+                required=True
+            ),
+            "Meta Esperada": st.column_config.NumberColumn("Meta Planejada", format="%.1f")
+        },
+        use_container_width=True,
+        hide_index=True,
+        key="editor_simulados"
+    )
+    st.session_state.registros_simulados = df_simulados_edited
+
+with tab_treineiros:
+    st.markdown("##### Preenchimento dos Exames como Treineiro:")
+    df_treineiros_edited = st.data_editor(
+        st.session_state.registros_treineiros,
+        num_rows="dynamic",
+        column_config={
+            "Nome do Treineiro / Exame": st.column_config.TextColumn("Nome do Processo Seletivo / Treineiro", required=True),
+            "Data Realizada": st.column_config.DateColumn("Data da Prova", required=True),
+            "Desempenho Obtido (Pontos)": st.column_config.NumberColumn(
+                "Desempenho Obtido",
+                min_value=0.0,
+                max_value=1000.0,
+                format="%.1f",
+                required=True
+            ),
+            "Status de Classificação": st.column_config.SelectboxColumn(
+                "Status / Resultado",
+                options=["Não Classificado", "Aprovado na 1ª Fase", "Classificado p/ 2ª Fase", "Lista de Espera", "Aprovado Final"]
+            )
+        },
+        use_container_width=True,
+        hide_index=True,
+        key="editor_treineiros"
+    )
+    st.session_state.registros_treineiros = df_treineiros_edited
+
+st.markdown("---")
+
+# ==========================================
+# 8. GRÁFICOS DE ACOMPANHAMENTO HISTÓRICO
+# ==========================================
+st.subheader("📊 Gráficos de Evolução das Notas")
 
 g1, g2 = st.columns(2)
 
 with g1:
-    st.markdown("##### 📈 Evolução das Notas nos Simulados e Média")
+    st.markdown("##### 📈 Evolução Histórica (Registros do Sistema)")
     df_chart = df_aluno_periodo.set_index("avaliacao")[["simulado_geral", "simulado_sas", "nota_treineiro"]]
     df_chart.columns = ["Simulado Geral", "Simulado SAS", "Nota Treineiro"]
     st.line_chart(df_chart)
 
 with g2:
-    st.markdown("##### 🎯 Comparativo Última Avaliação x Médias")
-    df_bar = pd.DataFrame({
-        "Pontuação": [simulado_atual, sas_atual, aluno_dados_recentes['nota_treineiro']]
-    }, index=["Simulado Geral", "Simulado SAS", "Treineiro"])
-    st.bar_chart(df_bar)
+    st.markdown("##### 🎯 Desempenho nos Simulados Cadastrados")
+    if not st.session_state.registros_simulados.empty:
+        df_sim_chart = st.session_state.registros_simulados.set_index("Nome do Simulado")[["Desempenho Obtido (Pontos)"]]
+        st.bar_chart(df_sim_chart)
+    else:
+        st.info("Cadastre seus simulados na tabela acima para visualizar o gráfico.")
 
 st.markdown("---")
 
 # ==========================================
-# 8. PLANEJAMENTO DE CARREIRA E ESTRATÉGIA
+# 9. PLANEJAMENTO DE CARREIRA E ESTRATÉGIA
 # ==========================================
-
 st.subheader("🎯 Orientação Profissional e Estratégia de Vestibular")
 
 c_carreira, c_vest = st.columns([1.2, 0.8])
@@ -335,7 +447,7 @@ with c_vest:
     st.bar_chart(df_cursos)
 
 # ==========================================
-# 9. PROCESSOS SELETIVOS E INSCRIÇÕES
+# 10. PROCESSOS SELETIVOS E INSCRIÇÕES
 # ==========================================
 st.subheader("📚 Guia de Vestibulares e Gestão de Inscrições")
 
@@ -365,12 +477,13 @@ with tab_minhas_inscricoes:
             )
         },
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
+        key="editor_inscricoes"
     )
     st.session_state.inscricoes = df_inscricoes_editado
 
 # ==========================================
-# 10. REGISTRO HISTÓRICO COMPLETO
+# 11. REGISTRO HISTÓRICO COMPLETO
 # ==========================================
 with st.expander("📄 Visualizar Tabela Completa do Histórico Acadêmico Individual"):
     cols_historico = [
