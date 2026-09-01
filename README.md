@@ -4,45 +4,46 @@
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-2.0%2B-150458?style=for-the-badge&logo=pandas&logoColor=white)
 
-O **Dashboard de Acompanhamento Vestibular** foi desenvolvido para centralizar, visualizar e gerenciar o desempenho acadêmico e a jornada de alunos em preparação para vestibulares. 
+O **Dashboard de Acompanhamento Preditivo de Vestibular** foi desenvolvido para centralizar, visualizar e gerenciar o desempenho acadêmico e a jornada de alunos em preparação para vestibulares. 
 
 ---
 ## 📌 O que é o projeto?
 
-O Dashboard Preditivo de Desempenho Educacional (Vestibulares 2026) é uma solução completa de Business Intelligence e Data Analytics projetada para transformar a gestão de acompanhamento vestibular. Desenvolvido para atuar na interseção entre inteligência de dados e psicologia escolar, a plataforma centraliza a jornada do estudante em uma única interface preditiva e analítica.
+O Dashboard Preditivo de Desempenho Educacional é uma solução completa de Business Intelligence e Data Analytics desenvolvida para transformar o acompanhamento de estudantes do 3º Ano do Ensino Médio durante a preparação para o vestibular. Desenvolvida na interseção entre inteligência de dados, orientação pedagógica e psicologia escolar, a plataforma centraliza a jornada individual do estudante em uma interface segura, analítica e preditiva.
 
-Em vez de analisar apenas notas isoladas, o projeto unifica métricas acadêmicas quantitativas (desempenho no ENEM, FUVEST e simulados) a dados qualitativos e socioemocionais (saúde mental, contexto familiar e vulnerabilidade). Isso permite que orientadores pedagógicos e analistas educacionais identifiquem riscos precocemente, avaliem a viabilidade real dos planos de aprovação do aluno e tomem decisões fundamentadas para maximizar o sucesso de ingressos universitários.
-
-A ferramenta unifica dados de desempenho (ENEM, Simulados Fuvest e exames próprios) com dados estratégicos (maturidade de escolha de curso, planos A/B de aprovação) e dados qualitativos (saúde mental, fatores de risco e planos de intervenção pedagógica/psicológica).
+A aplicação unifica dados quantitativos de desempenho escolar e exames (médias acadêmicas, simulados gerais/SAS e registros como treineiro) a um planejamento estratégico de carreira com até 3 opções de cursos/universidades (Planos A, B e C), além de um guia interativo com gerenciador de inscrições em vestibulares brasileiros.
 
 ---
 
 ## 🔑 Diferenciais: Funcionalidades e Impacto de Negócio
 
-- **Visão Holística 360° do Estudante:** Combina o desempenho técnico e cognitivo com fatores de risco socioemocionais (ansiedade, suporte familiar, vulnerabilidade socioeconômica), superando a análise fria de boletins tradicionais.
+- **Autenticação e Acesso Individual do Aluno:** Sistema restrito de login por senha individual simples, garantindo a privacidade dos dados do estudante e permitindo a troca segura entre perfis em ambiente de simulação/teste.
 
-- **Matriz de Viabilidade Preditiva (Planos A/B):** Cruza a nota atual do aluno com as notas de corte de múltiplos exames, mapeando a margem real de probabilidade de aprovação no plano principal e sugerindo ajustes estratégicos em planos alternativos.
+- **Central de Registro e Edição Interativa de Notas (st.data_editor):** médias acadêmicas por período/bimestre; histórico de simulados com controle dinâmico de notas, datas e registro de desempenho; registro de treineiros com status de classificação por fases.
 
-- **Gestão Ativa de Intervenções Pedagógicas:** Transforma diagnósticos em ação com um sistema interno de controle de pendências, fila de prioridades (Alta, Média e Baixa) e acompanhamento de planos de intervenção para aluno e família.
+- **Gerenciador de Inscrições e Isenções em Vestibulares:** Guia com informações consolidadas dos principais processos seletivos do país (ENEM, FUVEST, UNICAMP, UNESP) integrado a uma tabela editável para o aluno gerenciar números de protocolo, confirmações e solicitações de isenção de taxa.
 
-- **Design System Customizado para EdTech:** Interface rica desenvolvida com CSS3 e HTML5 injetados no Streamlit, garantindo alta usabilidade, badges dinâmicos de status e acessibilidade para equipes educacionais.
+- **Projeto de Vida e Estratégia de Carreira em Abas (Planos A, B e C):** Interface modular em st.tabs para cadastro e acompanhamento de até 3 opções de cursos e universidades, com espaço individual para justificativa e motivação da escolha.
 
 ---
 
 ## 🛠️ Arquitetura e Tecnologias
 
-* **Streamlit:** Framework para construção da interface Web, gerenciamento de estado (`session_state`), navegação modular em abas e colunas.
+* **Streamlit:** Framework principal para construção da interface Web, gerenciamento de estado (session_state), navegação modular em abas (st.tabs), formulários e editores de dados (st.data_editor).
 
-* **HTML5 & CSS3 Customizado:** Injeção de estilos para *design system* próprio (fontes *Google Fonts*, botões interativos, badges de status, alertas e componentes acessíveis).
+* **Gráficos e Visualizações Nativas:** Componentes visuais (st.line_chart e st.bar_chart) executados sem dependências externas adicionais, garantindo alta performance e leveza.
 
-* **Processamento e Tratamento de Dados (ETL):** Pandas
+* **Processamento e Manipulação de Dados (ETL):** Pandas e NumPy para estruturação de dataframes, cálculos de variação (deltas) e filtros dinâmicos temporais.
+
+* **Formatos de Dados e Estado:** Estrutura base em CSV e gerenciamento em memória (st.session_state) para manipulação de tabelas editáveis durante a sessão do usuário.
   
-* **Formatos de Dados:** Estruturas CSV e JSON para manipulação do estado da aplicação e estruturas de dados.
-
 ---
-## 💡 Como Navegar na Dashboard
 
-A navegação foi estruturada de forma intuitiva para atender tanto a análises táticas quanto operacionais:
+## 💡 Como Acessar e Navegar na Dashboard
+1. O dashboard está publicado e disponível para navegação direta através do ecossistema cloud do Streamlit:
+👉 [Acesse o Dashboard Online Aqui](https://preditivo-de-desempenho-educacional-para-aprovacao.streamlit.app/)
+
+2. A navegação foi estruturada de forma intuitiva para atender tanto a análises táticas quanto operacionais:
 
 ### Painel Geral de Turmas (Visão Macro):
 
@@ -54,22 +55,36 @@ A navegação foi estruturada de forma intuitiva para atender tanto a análises 
 
 ### Visão Individual do Aluno (Student Deep-Dive):
 
-- **Seção de Diagnóstico:** Acesse o histórico resumido, análise qualitativa do orientador e status de saúde mental.
+- **Acesso Individual Restrito por Autenticação:** Acesso protegido por senha simples configurada por estudante, permitindo a consulta segura aos dados individuais em modo de simulação de testes (com painel expansível de credenciais fictícias de acesso).
 
-- **Tabela de Opções e Planos:** Verifique os cursos cadastrados (Planos A a F), as notas do aluno vs. nota de corte e a classificação automática de viabilidade (Atingimento, Dentro da Nota, Reconsiderar).
+- **Métricas de Performance Instantâneas (KPIs):** Visualização no topo do painel das últimas médias acadêmicas da escola, notas recentes dos simulados gerais e SAS, pontuação em exames como treineiro e indicadores de evolução temporal (deltas) em relação às avaliações anteriores.
 
-- **Evolução Histórica:** Acompanhe o gráfico de linhas e barras com o desempenho comparativo por área do conhecimento ao longo das edições dos exames.
+- **Central de Registro e Edição Interativa de Notas (st.data_editor):**
+
+    - *Médias Acadêmicas na Escola:* Tabela preenchível para acompanhamento por bimestre/período, lançamento de médias, controle de faltas acumuladas e observações pedagógicas.
+
+    - *Registro de Simulados:* Tabela editável para digitação do nome do simulado, data de realização, pontuação/acertos obtidos e acompanhamento contra a meta planejada.
+
+    - *Registro de Treineiros:* Tabela preenchível dedicada ao histórico de provas realizadas como treineiro, contendo nome do processo seletivo, data e status de classificação (fases/aprovado).
+
+**Painel de Evolução e Gráficos Nativos:** Gráficos interativos sem dependências externas (st.line_chart e st.bar_chart) apresentando a linha do tempo das avaliações e o comparativo do desempenho mais recente.
+
+**Projeto de Vida e Mapeamento Multi-Opções de Carreira (Planos A, B e C):** Interface modular em abas (st.tabs) para que o aluno cadastre e gerencie até 3 opções de escolhas universitárias (1ª Opção / Plano A, 2ª Opção / Plano B e 3ª Opção / Plano C), cada uma com espaço dedicado para Curso, Instituição Alvo e Justificativa/Motivação individual.
+
+**Guia Oficial de Vestibulares e Gestão de Inscrições:** Tabela de consulta sobre os principais processos seletivos do Brasil (ENEM, FUVEST, UNICAMP, UNESP) acompanhada de um gerenciador editável de inscrições para o aluno controlar confirmação, número de protocolo e solicitações de isenção de taxa.
 
 ---
 ## 🧪 Validação e Qualidade da Aplicação (QA)
 
 Para garantir a estabilidade, precisão dos cálculos acadêmicos e fluidez da aplicação, foram aplicadas boas práticas de Garantia de Qualidade (QA) durante o desenvolvimento:
 
-- **Validação de Regras de Negócio e Cálculos:** Testes de consistência na geração dinâmica de métricas — como cálculo do diferencial de notas de corte, evolução percentual do ENEM e rotulagem correta das chances de aprovação.
+- **Validação de Regras de Negócio e Entrada de Dados (st.data_editor):** Testes de consistência na digitação e edição de tabelas dinâmicas — garantindo validações de limites (BVA) para notas escolares ($0.0$ a $10.0$), pontuações de simulados/treineiros ($0$ a $1000$ pontos) e datas válidas de realização das provas.
+  
+- **Validação de Autenticação e Controle de Acesso:** Testes do fluxo de autenticação individual por aluno com dicionário de credenciais de teste, incluindo checagem de mensagens de erro para senhas incorretas e validação da visibilidade do painel expansível de credenciais em modo de teste.
 
-- **Tratamento de Exceções e Resiliência:** Implementação de estratégias de manipulação de erros com para assegurar o carregamento gracioso da dashboard caso o arquivo de dados apresente valores nulos ou formatação inconsistente.
+- **Tratamento de Exceções e Resiliência (Fallback Data):** Implementação de estratégias de manipulação de dados para assegurar o carregamento gracioso do dashboard, evitando falhas de tela quando tabelas de simulados ou inscrições estiverem vazias ou apresentarem valores omissos.
 
-- **Testes de Layout e Responsividade:** Validação de componentes visuais, contraste em badges de status, integridade das fontes customizadas e adaptação do layout em colunas para múltiplos tamanhos de tela.
+- **Testes de Layout e Compatibilidade Nativa:** Validação dos componentes visuais nativos do Streamlit (gráficos st.line_chart e st.bar_chart), garantindo funcionamento $100\%$ autônomo sem dependências externas adicionais (como Plotly), boa adaptação do layout em colunas e legibilidade das abas (st.tabs) em múltiplos tamanhos de tela.
 
 ---
 
@@ -78,7 +93,5 @@ Para garantir a estabilidade, precisão dos cálculos acadêmicos e fluidez da a
 > Psicóloga Escolar | Analista Educacional Sênior | Data & Tech Enabler (QA & Python)
 
 📧 **E-mail:** isabelabueno.tech@gmail.com
-
 💼 **LinkedIn:** isabela-bueno-silva
-
 🐱 **GitHub:** @isabelabuenotech
